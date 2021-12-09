@@ -44,7 +44,7 @@ public class LibraryApplication {
     @Value("${library.albums.load:true}")
     private boolean doLoadAlbums;
 
-    @Value("${library.albums.dataset:data//elastic//albums_sample.json}")
+    @Value("${library.albums.dataset:data/elastic/albums_sample.json}")
     private String datasetClasspath;
 
     /** The elasticsearch operations. */
@@ -86,13 +86,13 @@ public class LibraryApplication {
     }
 
     /**
-     * Load dataset.
+     * Load Json dataset as a list of Album documents
      *
-     * @return the collection
+     * @return the list of Album documents
      */
     private Collection<Album> loadDataset() {
 
-        // read JSON file and convert to Java Album Objects
+        // read JSON file and convert to Java Objects
         try {
             List<Album> albums = new ObjectMapper().readValue(new ClassPathResource(this.datasetClasspath).getFile(), List.class);
             return albums;
