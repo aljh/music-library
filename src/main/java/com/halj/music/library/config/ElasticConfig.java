@@ -20,11 +20,20 @@ public class ElasticConfig {
 
     /** The elastic host. */
     @Value("${elasticsearch.host:localhost}")
-    private String elasticHost;
+    private String host;
 
     /** The elastic port. */
     @Value("${elasticsearch.port:9200}")
-    private int elasticPort;
+    private int port;
+
+    @Value("${elasticsearch.auth.enable:false}")
+    private boolean authentication;
+
+    @Value("${elasticsearch.auth.username:username}")
+    private String username;
+
+    @Value("${elasticsearch.auth.password:password}")
+    private String password;
 
     /**
      * Client.
@@ -33,11 +42,23 @@ public class ElasticConfig {
      */
     @Bean
     public RestHighLevelClient client() {
-        ClientConfiguration clientConfiguration = ClientConfiguration.builder()
-                .connectedTo(this.elasticHost + ":" + this.elasticPort)
-                .build();
+        ClientConfiguration clientConfiguration = this.authentication ? authenticationClientConfiguration() : simpleClientConfiguration();
 
         return RestClients.create(clientConfiguration).rest();
+    }
+
+    private ClientConfiguration simpleClientConfiguration() {
+        return ClientConfiguration.builder()
+                .connectedTo(this.host + ":" + this.port)
+                .build();
+    }
+
+    private ClientConfiguration authenticationClientConfiguration() {
+        return ClientConfiguration.builder()
+                .connectedTo(this.host + ":" + this.port)
+                .usingSsl()
+                .withBasicAuth(this.username, this.password)
+                .build();
     }
 
     /**
