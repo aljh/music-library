@@ -39,7 +39,7 @@ Elasticsearch client's config can be changed with the application.properties fil
 		elasticsearch.auth.username:username
 		elasticsearch.auth.password:password
 		
-At startup, Elasticsearch client will run and try to connect to the Elasticsearch instance. Once connected, it will automatically load the album dataset and proceed with a bulk insert into Elasticsearc index 'albums'; The default dataset file location is : /resources/data/elastic/albums_sample.json and can be configured in the application properties file:
+At startup, Elasticsearch client will run and try to connect to the Elasticsearch instance. Once connected, it will automatically load the album dataset and proceed with a bulk insert into Elasticsearch index 'albums'; The default dataset file location is : /resources/data/elastic/albums_sample.json and can be configured in the application properties file:
 
 		library.albums.load:true 
 		library.albums.dataset:data/elastic/albums_sample.json
@@ -50,7 +50,7 @@ At startup, Elasticsearch client will run and try to connect to the Elasticsearc
 		$ mvn package
 		$ mvn spring-boot:run
 
-the API is accessible on <http://localhost:8080> and be tested via a Swagger ui on  <http://localhost:8080/swagger-ui/index.html> 
+The API is accessible on <http://localhost:8080> and be tested via a Swagger ui on  <http://localhost:8080/swagger-ui/index.html> 
 
 Open API descriptions are available on <http://localhost:8080/api-docs/>
 
