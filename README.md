@@ -4,7 +4,7 @@
 
 This application allows an administrator:
 1. to curate users and albums
-2. to curate users’ libraries
+2. to curate users libraries
 
 ### Functionalities
 
@@ -13,6 +13,7 @@ This application allows an administrator:
 - List (search), create, update and delete users
 
 **Manage the global album library**
+
 It's the list of all the albums available in the application and that users can add to their personal libraries
 - Each album have at least the following fields: title, artist, year
 - create, update, delete and search (see details below) albums
@@ -22,20 +23,35 @@ It's the list of all the albums available in the application and that users can 
 - Add/remove existing albums to a user’s library
 - List albums for a given user
 
-### Requirements
+### Requirements and config
 
-- Java 11 or later, Maven 3, Elasticsearch instance running on port 9200. If you have docker insatlled, you can run an elasticsearch container with the following command:
+- Java 11 or later, Maven 3, Elasticsearch instance running. 
+
+If you have docker installed, you can run an elasticsearch container with the following command:
 
 		$ sudo docker run -p 127.0.0.1:9200:9200 -e ES_JAVA_OPTS="-Xms512m -Xmx512m" -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.15.2
 
-- build and run the aplication
+Elasticsearch client's config can be changed with the application.properties file (default values below):
+ 
+		elasticsearch.host:localhost
+		elasticsearch.port:9200
+		elasticsearch.auth.enable:false
+		elasticsearch.auth.username:username
+		elasticsearch.auth.password:password
+		
+At startup, Elasticsearch client will run and try to connect to the Elasticsearch instance. Once connected, it will automatically load the album dataset and proceed with a bulk insert into Elasticsearc index 'albums'; The default dataset file location is : /resources/data/elastic/albums_sample.json and can be configured in the application properties file:
+
+		library.albums.load:true 
+		library.albums.dataset:data/elastic/albums_sample.json
+
+		
+### Build and run the application
 
 		$ mvn package
 		$ mvn spring-boot:run
-		$ java -jar <jar> com.halj.music.library.LibraryApplication
 
-### Api documentation 
-- Swagger <http://localhost:8080/swagger-ui/index.html>
-- Open API descriptions <http://localhost:8080/api-docs/>
+the API is accessible on <http://localhost:8080> and be tested via a Swagger ui on  <http://localhost:8080/swagger-ui/index.html> 
+
+Open API descriptions are available on <http://localhost:8080/api-docs/>
 
 
