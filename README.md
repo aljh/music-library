@@ -51,6 +51,6 @@ Users are saved in a H2 database and Elasticsearch albums index is reset between
 		$ mvn package
 		$ mvn spring-boot:run
 
-The API is accessible on <http://localhost:8080> and can be tested via a Swagger page on  <http://localhost:8080/swagger-ui/index.html?configUrl=/api-docs/swagger-config#/> 
+The API is accessible on <http://localhost:8080> and can be tested via a [Swagger page](http://localhost:8080/swagger-ui/index.html?configUrl=/api-docs/swagger-config#/) 
 
 
