@@ -44,6 +44,7 @@ At startup, Elasticsearch client will run and try to connect to the Elasticsearc
 		library.albums.load:true 
 		library.albums.dataset:data/elastic/albums_sample.json
 
+Users are saved on a in memory H2 db, and Elasticsearch albums index is reset between executions, so all data created is only kept alive while the music library application is running and cleared after execution.
 		
 ### Build and run the application
 
