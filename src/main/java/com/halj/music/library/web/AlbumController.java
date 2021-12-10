@@ -88,9 +88,9 @@ public class AlbumController {
      */
     @Operation(summary = "Remove albums from global library")
     @DeleteMapping
-    public ResponseEntity<Void> removeAlbums(@RequestBody List<@Valid Album> albums) {
+    public ResponseEntity<Void> removeAlbums(@RequestBody List<UUID> uuids) {
 
-        this.albumService.deleteAlbums(albums);
+        this.albumService.deleteAlbums(uuids);
 
         return ResponseEntity.noContent().build();
     }
@@ -103,9 +103,9 @@ public class AlbumController {
      */
     @Operation(summary = "Delete album from global library")
     @DeleteMapping(path = "/{uuid}")
-    public ResponseEntity<Album> removeAlbum(@PathVariable UUID albumId) {
+    public ResponseEntity<Album> removeAlbum(@PathVariable UUID uuid) {
 
-        this.albumService.deleteAlbum(albumId);
+        this.albumService.deleteAlbum(uuid);
 
         return ResponseEntity.noContent().build();
     }

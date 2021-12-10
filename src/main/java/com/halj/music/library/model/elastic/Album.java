@@ -32,7 +32,6 @@ public class Album {
     private String artist;
 
     /** The release year. */
-    @NotBlank
     @Digits(fraction = 0, integer = 4)
     @Field(type = FieldType.Text, name = "releaseYear")
     private String releaseYear;

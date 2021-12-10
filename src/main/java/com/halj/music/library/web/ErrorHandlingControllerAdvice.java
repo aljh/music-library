@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.halj.music.library.exception.UserNotFoundException;
+
 /**
  * The Class ErrorHandlingControllerAdvice.
  * Handler for validation errors to display more readable validation error messages
@@ -47,5 +49,16 @@ class ErrorHandlingControllerAdvice {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public String handleDataConflict() {
         return "Integrity constraint error: check that values in fields like 'email' are not already used";
+    }
+
+    /**
+     * Handle data integrity exceptions.
+     *
+     * @return the string
+     */
+    @ResponseStatus(value = HttpStatus.NOT_FOUND) // 404
+    @ExceptionHandler(UserNotFoundException.class)
+    public String handleUserNotFoundException(UserNotFoundException ex) {
+        return ex.getMessage();
     }
 }

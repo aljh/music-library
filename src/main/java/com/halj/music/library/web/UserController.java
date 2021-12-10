@@ -1,7 +1,6 @@
 package com.halj.music.library.web;
 
 import java.net.URI;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import com.halj.music.library.model.User;
-import com.halj.music.library.repository.UserRepository;
+import com.halj.music.library.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,9 +30,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/users")
 public class UserController {
 
-    /** The user repository. */
+    /** The user service. */
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     /**
      * Gets the all.
@@ -43,7 +42,7 @@ public class UserController {
     @Operation(summary = "Get all users")
     @GetMapping
     public ResponseEntity<Iterable<User>> getAll() {
-        return ResponseEntity.ok(this.userRepository.findAll());
+        return ResponseEntity.ok(this.userService.getAll());
     }
 
     /**
@@ -55,13 +54,7 @@ public class UserController {
     @Operation(summary = "Find a user")
     @GetMapping(path = "/{userId}")
     public ResponseEntity<User> getUser(@PathVariable Long userId) {
-        Optional<User> optionalUser = this.userRepository.findById(userId);
-
-        if (optionalUser.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(optionalUser.get());
+        return ResponseEntity.ok(this.userService.getUser(userId));
     }
 
     /**
@@ -74,7 +67,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
 
-        User saved = this.userRepository.save(user);
+        User saved = this.userService.createUser(user);
 
         URI uri = MvcUriComponentsBuilder.fromController(getClass())
                 .path("/{id}")
@@ -85,7 +78,7 @@ public class UserController {
     }
 
     /**
-     * Put.
+     * Updates the user.
      *
      * @param userId the user id
      * @param user the user
@@ -93,19 +86,11 @@ public class UserController {
      */
     @Operation(summary = "Update an existing user")
     @PutMapping("/{id}")
-    public ResponseEntity<User> put(@PathVariable("id") Long userId, @Valid @RequestBody User user) {
-        if (!this.userRepository.existsById(userId)) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<User> updateUser(@PathVariable("id") Long userId, @Valid @RequestBody User user) {
 
-        } else {
-            User saved = this.userRepository.save(
-                    new User(userId,
-                            user.getName(),
-                            user.getEmail(),
-                            user.getAlbumIds()));
+        User saved = this.userService.saveUser(userId, user);
 
-            return ResponseEntity.ok(saved);
-        }
+        return ResponseEntity.ok(saved);
     }
 
     /**
@@ -118,14 +103,9 @@ public class UserController {
     @DeleteMapping(path = "/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
 
-        if (!this.userRepository.existsById(userId)) {
-            return ResponseEntity.notFound().build();
-        } else {
-            this.userRepository.deleteById(userId);
+        this.userService.deleteUser(userId);
 
-            return ResponseEntity.noContent().build();
-        }
-
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -137,7 +117,7 @@ public class UserController {
     @DeleteMapping
     public ResponseEntity<Void> clearUsers() {
 
-        this.userRepository.deleteAll();
+        this.userService.deleteAll();
 
         return ResponseEntity.noContent().build();
     }

@@ -1,6 +1,7 @@
 package com.halj.music.library.web;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.halj.music.library.dto.LibraryItemDTO;
 import com.halj.music.library.model.elastic.Album;
 import com.halj.music.library.service.LibraryService;
 
@@ -53,9 +53,9 @@ public class LibraryController {
      */
     @Operation(summary = "Add one or several albums to user library")
     @PutMapping(path = "/{userId}/albums")
-    public ResponseEntity<Iterable<Album>> addAlbums(@PathVariable Long userId, @RequestBody List<LibraryItemDTO> libraryItems) {
+    public ResponseEntity<Iterable<Album>> addAlbums(@PathVariable Long userId, @RequestBody List<UUID> albumIds) {
 
-        this.libraryService.addAlbums(libraryItems, userId);
+        this.libraryService.addAlbums(albumIds, userId);
 
         return ResponseEntity.ok(this.libraryService.getAlbums(userId)); // return updated albums list
     }
@@ -69,9 +69,9 @@ public class LibraryController {
      */
     @Operation(summary = "Remove one or several albums from user library")
     @DeleteMapping(path = "/{userId}/albums")
-    public ResponseEntity<Iterable<Album>> removeAlbums(@PathVariable Long userId, @RequestBody List<LibraryItemDTO> libraryItems) {
+    public ResponseEntity<Iterable<Album>> removeAlbums(@PathVariable Long userId, @RequestBody List<UUID> albumIds) {
 
-        this.libraryService.removeAlbums(libraryItems, userId);
+        this.libraryService.removeAlbums(albumIds, userId);
 
         return ResponseEntity.ok(this.libraryService.getAlbums(userId)); // return updated albums list
     }

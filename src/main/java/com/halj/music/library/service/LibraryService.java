@@ -1,20 +1,14 @@
 package com.halj.music.library.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import com.halj.music.library.dto.LibraryItemDTO;
-import com.halj.music.library.exception.UserNotFoundException;
-import com.halj.music.library.model.User;
 import com.halj.music.library.model.elastic.Album;
-import com.halj.music.library.repository.UserRepository;
 import com.halj.music.library.repository.elastic.AlbumRepository;
 
 /**
@@ -24,8 +18,8 @@ import com.halj.music.library.repository.elastic.AlbumRepository;
 @Service
 public class LibraryService {
 
-    /** The user repository. */
-    private UserRepository userRepository;
+    /** The user service. */
+    private UserService userService;
 
     /** The album repository. */
     private AlbumRepository albumRepository;
@@ -33,57 +27,57 @@ public class LibraryService {
     /**
      * Instantiates a new library service.
      *
-     * @param userRepository the user repository
+     * @param userService the user service
      * @param albumRepository the album repository
      */
-    public LibraryService(UserRepository userRepository, AlbumRepository albumRepository) {
+    public LibraryService(UserService userService, AlbumRepository albumRepository) {
         super();
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.albumRepository = albumRepository;
     }
 
     /**
      * Adds the album.
      *
-     * @param libraryItem the library item
+     * @param albumId the album id
      * @param userId the user id
      */
     @Transactional
-    public void addAlbum(LibraryItemDTO libraryItem, Long userId) {
-        getUser(userId).getAlbumIds().add(libraryItem.getAlbumId());
+    public void addAlbum(UUID albumId, Long userId) {
+        this.userService.getUser(userId).getAlbumIds().add(albumId);
     }
 
     /**
      * Adds the albums.
      *
-     * @param libraryItems the library items
+     * @param albumIds the album ids
      * @param userId the user id
      */
     @Transactional
-    public void addAlbums(List<LibraryItemDTO> libraryItems, Long userId) {
-        getUser(userId).getAlbumIds().addAll(toAlbumIds(libraryItems));
+    public void addAlbums(List<UUID> albumIds, Long userId) {
+        this.userService.getUser(userId).getAlbumIds().addAll(albumIds);
     }
 
     /**
      * Removes the album.
      *
-     * @param libraryItem the library item
+     * @param albumId the album id
      * @param userId the user id
      */
     @Transactional
-    public void removeAlbum(LibraryItemDTO libraryItem, Long userId) {
-        getUser(userId).getAlbumIds().remove(libraryItem.getAlbumId());
+    public void removeAlbum(UUID albumId, Long userId) {
+        this.userService.getUser(userId).getAlbumIds().remove(albumId);
     }
 
     /**
      * Removes the albums.
      *
-     * @param libraryItems the library items
+     * @param albumIds the album ids
      * @param userId the user id
      */
     @Transactional
-    public void removeAlbums(List<LibraryItemDTO> libraryItems, Long userId) {
-        getUser(userId).getAlbumIds().removeAll(toAlbumIds(libraryItems));
+    public void removeAlbums(List<UUID> albumIds, Long userId) {
+        this.userService.getUser(userId).getAlbumIds().removeAll(albumIds);
     }
 
     /**
@@ -93,7 +87,7 @@ public class LibraryService {
      */
     @Transactional
     public void clearAlbums(Long userId) {
-        getUser(userId).getAlbumIds().clear();
+        this.userService.getUser(userId).getAlbumIds().clear();
     }
 
     /**
@@ -103,34 +97,8 @@ public class LibraryService {
      * @return the albums
      */
     public Iterable<Album> getAlbums(Long userId) {
-        Set<UUID> albumIds = getUser(userId).getAlbumIds();
+        Set<UUID> albumIds = this.userService.getUser(userId).getAlbumIds();
         return this.albumRepository.findAllById(albumIds);
-    }
-
-    /**
-     * To album ids.
-     *
-     * @param libraryItems the library items
-     * @return the list
-     */
-    private List<UUID> toAlbumIds(List<LibraryItemDTO> libraryItems) {
-        return libraryItems.stream()
-                .map(LibraryItemDTO::getAlbumId)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Gets the user.
-     *
-     * @param userId the user id
-     * @return the user
-     */
-    private User getUser(Long userId) {
-        Optional<User> user = this.userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get();
-        } else
-            throw new UserNotFoundException("No user found matching id " + userId);
     }
 
 }

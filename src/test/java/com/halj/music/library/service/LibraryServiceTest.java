@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,10 +19,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.halj.music.library.dto.LibraryItemDTO;
 import com.halj.music.library.model.User;
 import com.halj.music.library.model.elastic.Album;
-import com.halj.music.library.repository.UserRepository;
 import com.halj.music.library.repository.elastic.AlbumRepository;
 
 /**
@@ -39,15 +36,15 @@ class LibraryServiceTest {
 
         @Bean
         @Primary
-        public LibraryService playerService(UserRepository userRepository, AlbumRepository albumRepository) {
-            return new LibraryService(userRepository, albumRepository);
+        public LibraryService playerService(UserService userService, AlbumRepository albumRepository) {
+            return new LibraryService(userService, albumRepository);
         }
 
     }
 
     // Mock repositories - we are no testing that repositories work
     @MockBean
-    UserRepository userRepository;
+    UserService userService;
 
     @MockBean
     AlbumRepository albumRepository;
@@ -62,10 +59,10 @@ class LibraryServiceTest {
 
     @BeforeEach
     public void setUp() {
-        User john = new User(USER_ID_1, "john", "john@email.com");
+        User userJohn = new User(USER_ID_1, "john", "john@email.com");
 
-        Mockito.when(this.userRepository.findById(USER_ID_1))
-                .thenReturn(Optional.of(john));
+        Mockito.when(this.userService.getUser(USER_ID_1))
+                .thenReturn(userJohn);
 
         // mock album 1 in user library
         {
@@ -104,14 +101,12 @@ class LibraryServiceTest {
     @Test
     void test_addSingleAlbumAndGetLibrary() {
 
-        LibraryItemDTO libraryItem = new LibraryItemDTO(ALBUM_ID_1);
-
-        // library should be empty before adding albums
+        // user library should be empty before adding albums
         List<Album> library = toList(this.libraryService.getAlbums(USER_ID_1));
         assertEquals(0, library.size());
 
         // add 1 album
-        this.libraryService.addAlbum(libraryItem, USER_ID_1);
+        this.libraryService.addAlbum(ALBUM_ID_1, USER_ID_1);
         library = toList(this.libraryService.getAlbums(USER_ID_1));
 
         assertEquals(1, library.size());
@@ -121,16 +116,16 @@ class LibraryServiceTest {
 
     @Test
     void test_addAlbumsAndGetLibrary() {
-        List<LibraryItemDTO> libraryItems = new ArrayList<>();
-        libraryItems.add(new LibraryItemDTO(ALBUM_ID_1));
-        libraryItems.add(new LibraryItemDTO(ALBUM_ID_2));
+        List<UUID> albumIds = new ArrayList<>();
+        albumIds.add(ALBUM_ID_1);
+        albumIds.add(ALBUM_ID_2);
 
         // library should be empty before adding albums
         List<Album> library = toList(this.libraryService.getAlbums(USER_ID_1));
         assertEquals(0, library.size());
 
         // add 1 album
-        this.libraryService.addAlbums(libraryItems, USER_ID_1);
+        this.libraryService.addAlbums(albumIds, USER_ID_1);
         library = toList(this.libraryService.getAlbums(USER_ID_1));
 
         assertEquals(2, library.size());
@@ -143,18 +138,15 @@ class LibraryServiceTest {
     @Test
     void test_removeSingleAlbumAndGetLibrary() {
 
-        LibraryItemDTO libraryItem1 = new LibraryItemDTO(ALBUM_ID_1);
-        LibraryItemDTO libraryItem2 = new LibraryItemDTO(ALBUM_ID_2);
-
         // put 2 albums in library
-        this.libraryService.addAlbum(libraryItem1, USER_ID_1);
-        this.libraryService.addAlbum(libraryItem2, USER_ID_1);
+        this.libraryService.addAlbum(ALBUM_ID_1, USER_ID_1);
+        this.libraryService.addAlbum(ALBUM_ID_2, USER_ID_1);
 
         List<Album> library = toList(this.libraryService.getAlbums(USER_ID_1));
         assertEquals(2, library.size());
 
         // remove first album from library
-        this.libraryService.removeAlbum(libraryItem1, USER_ID_1);
+        this.libraryService.removeAlbum(ALBUM_ID_1, USER_ID_1);
 
         library = toList(this.libraryService.getAlbums(USER_ID_1));
         assertEquals(1, library.size());
@@ -165,9 +157,9 @@ class LibraryServiceTest {
     @Test
     void test_removeAlbumsAndGetLibrary() {
 
-        List<LibraryItemDTO> libraryItems = new ArrayList<>();
-        libraryItems.add(new LibraryItemDTO(ALBUM_ID_1));
-        libraryItems.add(new LibraryItemDTO(ALBUM_ID_2));
+        List<UUID> libraryItems = new ArrayList<>();
+        libraryItems.add(ALBUM_ID_1);
+        libraryItems.add(ALBUM_ID_2);
 
         // put 2 albums in library
         this.libraryService.addAlbums(libraryItems, USER_ID_1);
