@@ -86,11 +86,20 @@ public class AlbumController {
      * @param albums the albums
      * @return the response entity
      */
-    @Operation(summary = "Remove albums from global library")
+    @Operation(summary = "Remove set of albums from global library")
     @DeleteMapping
     public ResponseEntity<Void> removeAlbums(@RequestBody List<UUID> uuids) {
 
         this.albumService.deleteAlbums(uuids);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Clear (remove all albums) global library")
+    @DeleteMapping(path = "/all")
+    public ResponseEntity<Void> removeAllAlbums() {
+
+        this.albumService.deleteAllAlbums();
 
         return ResponseEntity.noContent().build();
     }
@@ -101,7 +110,7 @@ public class AlbumController {
      * @param albumId the album id
      * @return the response entity
      */
-    @Operation(summary = "Delete album from global library")
+    @Operation(summary = "Delete an album from global library")
     @DeleteMapping(path = "/{uuid}")
     public ResponseEntity<Album> removeAlbum(@PathVariable UUID uuid) {
 
@@ -116,7 +125,7 @@ public class AlbumController {
      * @param uuid the uuid
      * @return the album
      */
-    @Operation(summary = "Retrieve album from global library")
+    @Operation(summary = "Retrieve an album from global library")
     @GetMapping(path = "/{uuid}")
     public ResponseEntity<Album> getAlbum(@PathVariable UUID uuid) {
 

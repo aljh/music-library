@@ -78,7 +78,6 @@ public class AlbumService {
      * @param albums the albums
      */
     public void deleteAlbums(final List<UUID> albumIds) {
-        // List<UUID> albumIds = albumRefs.stream().map(LibraryItemDTO::getAlbumId).collect(Collectors.toList());
         this.albumRepository.deleteAllById(albumIds);
     }
 
@@ -89,6 +88,13 @@ public class AlbumService {
      */
     public void deleteAlbum(final UUID albumId) {
         this.albumRepository.deleteById(albumId);
+    }
+
+    /**
+     * Delete all albums.
+     */
+    public void deleteAllAlbums() {
+        this.albumRepository.deleteAll();
     }
 
     /**
